@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Password Hack Challenge</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #eee;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      transition: background 2s ease;
+    }
+
+    .box {
+      width: 400px;
+      padding: 30px;
+      background: #1e1e1e;
+      border-radius: 10px;
+      text-align: center;
+      transition: background 2s ease;
+    }
+    
+    .progress-container {
+      width: 100%;
+      height: 40px;
+      background: #333;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 30px;
+      display: none;
+    }
+
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background: #cc0000;
+      transition: width linear;
+      box-shadow: 0 0 20px red;
+    }
+
+.main-layout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+}
+
+.image-panel img {
+  width: 400px;
+  height: 400px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 2px solid #333;
+}
+
+body.hacked .image-panel img {
+  filter:
+    hue-rotate(-50deg)
+    saturate(2)
+    brightness(0.8);
+}
+
+.score {
+  margin-top: 15px;
+  font-size: 26px;
+  color: #ff4444;
+}
+
+.footer-disclaimer {
+  position: fixed;
+
+  bottom: 20px;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  font-size: 12px;
+
+  color: #777;
+
+  text-align: center;
+
+  width: 90%;
+
+  max-width: 700px;
+
+  line-height: 1.5;
+}
+
+#statusText {
+  margin-top: 20px;
+  font-size: 20px;
+  min-height: 30px;
+}
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-top: 15px;
+      font-size: 18px;
+      box-sizing: border-box;
+      border: none;
+      border-radius: 5px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 12px 20px;
+      font-size: 16px;
+      background: #00aa66;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #008855;
+    }
+
+    #output {
+      margin-top: 25px;
+      font-size: 22px;
+      min-height: 60px;
+    }
+
+    .small {
+      margin-top: 20px;
+      font-size: 12px;
+      color: #888;
+    }
+
+    .blink {
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      50% {
+        opacity: 0.3;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="main-layout">
+
+  <div class="image-panel">
+    <img
+      src="squirrel.jpg"
+      alt="Hacker animation"
+    >
+  </div>
+
+  <div class="box">
+
+    <h1>Woordenkraker</h1>
+
+    <p>
+      Voer een wachtwoord in.
+    </p>
+
+    <input
+      type="password"
+      id="password"
+      placeholder="Wachtwoord"
+      autocomplete="off"
+    >
+
+    <button onclick="startHack()">
+      🐿️ Begin met kraken
+    </button>
+
+    <div id="statusText"></div>
+
+    <div class="progress-container" id="progressContainer">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+
+  </div>
+
+</div>
+
+<!-- zxcvbn library -->
+<script type="text/javascript" src="assets/js/zxcvbn.js"></script>
+
+<script>
+
+function getScoreColor(score) {
+
+  // Clamp tussen 0 en 20
+  const capped = Math.max(0, Math.min(score, 20));
+
+  // 0 → 120 hue
+  const hue = capped * 6;
+
+  // Mooie verzadigde kleur
+  return `hsl(${hue}, 85%, 45%)`;
+}
+
+function startHack() {
+
+  // Reset achtergrond
+  document.body.style.background = "#111";
+
+  // Reset boxkleur
+  document.querySelector(".box").style.background = "#1e1e1e";
+
+  // Reset progress bar
+  const progressBar = document.getElementById("progressBar");
+  progressBar.style.transition = "none";
+  progressBar.style.width = "0%";
+
+  const pwField = document.getElementById("password");
+  const statusText = document.getElementById("statusText");
+  const progressContainer = document.getElementById("progressContainer");
+
+  statusText.innerHTML = "";
+
+  const password = pwField.value;
+
+  if (password.length === 0) {
+    statusText.innerHTML = "Voer eerst een wachtwoord in.";
+    return;
+  }
+
+  // Lokale analyse
+  const result = zxcvbn(password);
+
+  const score = result.guesses_log10;
+
+  // minuten = score / 4
+  let minutes = score / 4;
+
+  // clamp tussen 1 en 8
+  if (minutes < 1) minutes = 0.5;
+  if (minutes > 5) minutes = 5;
+
+  // Verwijder wachtwoord onmiddellijk
+  pwField.value = "";
+
+  // UI reset
+  document.body.classList.remove("hacked");
+
+
+  progressContainer.style.display = "block";
+
+  statusText.innerHTML = "Wachtwoord kraken...";
+
+  // Force browser repaint
+  void progressBar.offsetWidth;
+
+  // Zet animatie
+  progressBar.style.transition =
+    `width ${minutes * 60}s linear`;
+
+  progressBar.style.width = "100%";
+
+  // Wanneer timer klaar is
+  setTimeout(() => {
+
+    const color = getScoreColor(score);
+
+// Achtergrond dynamisch kleuren
+document.body.style.background = color;
+
+// Ook box iets donkerder tint geven
+document.querySelector(".box").style.background =
+  `hsl(${Math.max(0, Math.min(score, 20)) * 6}, 50%, 18%)`;
+
+// Score tonen
+statusText.innerHTML = `
+  <div class="blink">WACHTWOORD GEKRAAKT</div>
+
+  <div
+    class="score"
+    style="color:${color}"
+  >
+    Security score: ${score.toFixed(1) * 1000 } 🌰
+  </div>
+`;
+
+  }, minutes * 60 * 1000);
+}
+
+</script>
+<div class="footer-disclaimer">
+  Gebruik geen belangrijk wachtwoord.
+  Deze tool kraakt niet echt wachtwoorden,
+  verstuurt geen informatie en houdt niets bij.
+  David Knapen 2026
+</div>
+</body>
+</html>
