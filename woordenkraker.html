@@ -175,7 +175,7 @@ body.hacked .image-panel img {
     >
 
     <button onclick="startHack()">
-      🐿️ Begin met kraken
+      Begin met kraken
     </button>
 
     <div id="statusText"></div>
@@ -207,6 +207,9 @@ function getScoreColor(score) {
 }
 
 function startHack() {
+
+  document.getElementById("startSound").currentTime = 0;
+  document.getElementById("startSound").play();
 
   // Reset achtergrond
   document.body.style.background = "#111";
@@ -266,6 +269,9 @@ function startHack() {
 
   // Wanneer timer klaar is
   setTimeout(() => {
+  
+    document.getElementById("doneSound").currentTime = 0;
+    document.getElementById("doneSound").play();
 
     const color = getScoreColor(score);
 
@@ -295,7 +301,9 @@ statusText.innerHTML = `
 <div class="footer-disclaimer">
   Gebruik geen belangrijk wachtwoord.
   Deze tool kraakt niet echt wachtwoorden,
-  verstuurt geen informatie en houdt niets bij. <a href="https://github.com/croketephji/woordenkraker">Github</a>
+  verstuurt geen informatie en houdt niets bij. Geluiden: Laughing Mouse Squirrel Cartoon by dersuperanton -- https://freesound.org/s/436168/ -- License: Attribution 4.0 en Keyboard_Tactile_8 by StavSounds -- https://freesound.org/s/766639/ -- License: Creative Commons 0. Afbeelding: <a href="https://github.com/croketephji/woordenkraker">Github</a>
 </div>
+<audio id="startSound" src="assets/sound/keyboard.ogg" preload="auto"></audio>
+<audio id="doneSound" src="assets/sound/squirrel.wav" preload="auto"></audio>
 </body>
 </html>
